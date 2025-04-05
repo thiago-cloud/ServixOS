@@ -58,6 +58,24 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, e);
         }
     }
+    
+    // Método para adicionar usuário
+    private void adicionar(){
+        String sql = "insert into tbusuarios(iduser, usuario, fone, login, senha, perfil)values (?,?,?,?,?,?)";
+                try{
+                    pst=conexao.prepareStatement(sql);
+                    pst.setString(1, txtUsuId.getText());// Settar no banco de dados com conteúdo do campo
+                    pst.setString(2, txtUsuNome.getText());
+                    pst.setString(3, txtUsuFone.getText());
+                    pst.setString(4, txtUsuLogin.getText());
+                    pst.setString(5, txtUsuSenha.getText());
+                    pst.setString(6, cboUsuPerfil.getSelectedItem().toString());// O dado precisa ser convertido para string por isso o toString()
+                   // Atualiza a tabela com os dados do formulário
+                   pst.executeUpdate();
+                }catch(Exception e){
+                    JOptionPane.showMessageDialog(null, e);
+                }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -132,6 +150,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         btnUsuCreate.setToolTipText("Adicionar");
         btnUsuCreate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnUsuCreate.setPreferredSize(new java.awt.Dimension(130, 130));
+        btnUsuCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUsuCreateActionPerformed(evt);
+            }
+        });
 
         btnUsuRead.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/servixos/icones/3440893_document_file_filetype_find_magnifier_icon.png"))); // NOI18N
         btnUsuRead.setToolTipText("Consultar");
@@ -261,6 +284,10 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
     private void btnUsuReadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuReadActionPerformed
        consultar();
     }//GEN-LAST:event_btnUsuReadActionPerformed
+    // Chamando o método adicionar
+    private void btnUsuCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuCreateActionPerformed
+        adicionar();
+    }//GEN-LAST:event_btnUsuCreateActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
