@@ -8,6 +8,7 @@ package br.com.servixos.telas;
 import javax.swing.SwingUtilities;
 import java.sql.*;
 import br.com.servixos.dao.ModuloConexao;
+import java.awt.Color;
 import javax.swing.JOptionPane;
 
 /**
@@ -30,11 +31,24 @@ public class TelaLogin extends javax.swing.JFrame {
             pst.setString(2, captura);
             // A linha abaixo executa a query
             rs = pst.executeQuery();
+            // Se existir usuário e senha correspndente
             if (rs.next()) {
+                String perfil = rs.getString(6);
+                
+                // Tratamento do perfil do usuário
+                if(perfil.equals("admin")){
                 TelaPrincipal principal = new TelaPrincipal();
                 principal.setVisible(true);
+                TelaPrincipal.menuRel.setEnabled(true);
+                TelaPrincipal.menuCadUsu.setEnabled(true);
+                TelaPrincipal.lblUsuario.setText(rs.getString(2));//Pegando o nome do banco de dados
                 this.dispose();
-                conexao.close();
+                } else {
+                    TelaPrincipal principal = new TelaPrincipal();
+                    TelaPrincipal.lblUsuario.setText(rs.getString(2));
+                    principal.setVisible(true);
+                    this.dispose();
+                }
             } else {
                 JOptionPane.showMessageDialog(null, "usuário e/ou senha inválido(s)");
             }
