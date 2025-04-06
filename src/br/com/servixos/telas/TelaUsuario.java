@@ -32,7 +32,7 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         conexao = ModuloConexao.connector();
     }
 
-    // Método que mostra a lista de usuários cadastrados
+    // Método Consutar usuários
     private void consultar() {
         String sql = "select * from tbusuarios where iduser=?";
         try {
@@ -94,16 +94,16 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
     // Método editar usuário
     private void editar() {
         String sql = "update tbusuarios set usuario=?, fone=?, login=?, senha=?, perfil=? where iduser=? ";
-        try{
+        try {
             pst = conexao.prepareStatement(sql);
-            pst.setString(1,txtUsuNome.getText());
-            pst.setString(2,txtUsuFone.getText());
-            pst.setString(3,txtUsuLogin.getText());
-            pst.setString(4,txtUsuSenha.getText());
-            pst.setString(5,cboUsuPerfil.getSelectedItem().toString());
-            pst.setString(6,txtUsuId.getText());
-            
-             // Validação dos campos obrigatórios
+            pst.setString(1, txtUsuNome.getText());
+            pst.setString(2, txtUsuFone.getText());
+            pst.setString(3, txtUsuLogin.getText());
+            pst.setString(4, txtUsuSenha.getText());
+            pst.setString(5, cboUsuPerfil.getSelectedItem().toString());
+            pst.setString(6, txtUsuId.getText());
+
+            // Validação dos campos obrigatórios
             if ((txtUsuId.getText().isEmpty()) || (txtUsuNome.getText().isEmpty()) || (txtUsuLogin.getText().isEmpty()) || (txtUsuSenha.getText().isEmpty())) {
                 JOptionPane.showMessageDialog(null, "Preencha os campos obrigatórios!");
             } else {
@@ -119,10 +119,72 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
                     txtUsuSenha.setText(null);
                 }
             }
-        } catch (Exception e){
-            JOptionPane.showMessageDialog(null,e);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
         }
+    }
+
+    // Método Remover usuário
+    private void remover() {
+        
+        // Verificar se o campo ID está preenchido corretamente
+        if (txtUsuId.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Por favor, insira um ID para remover!", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Verifica se no campo id existe espaços se tiver lança um erro
+        int id;
+        try {
+            id = Integer.parseInt(txtUsuId.getText().trim());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "ID inválido! Digite um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Verificar se o usuário existe antes de pedir a confirmação
+        String verificaSql = "SELECT COUNT(*) FROM tbusuarios WHERE iduser = ?";
+        try ( PreparedStatement verificaStmt = conexao.prepareStatement(verificaSql)) {
+            verificaStmt.setInt(1, id);
+            ResultSet rs = verificaStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) == 0) {
+                JOptionPane.showMessageDialog(null, "Usuário não encontrado!", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao verificar usuário: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Caixa de dialogo para confirmar remoção do usuário
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover este usuário", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirma == JOptionPane.YES_OPTION) {
+            //Removendo o usuário utilizando o id como referência
+            String sql = "delete from tbusuarios where iduser=?";
+
+            try {
+                // Estabelecendo conexão com o banco
+                pst = conexao.prepareStatement(sql);
+                pst.setString(1, txtUsuId.getText());
                 
+                // Caixa de mensagem confirmando que foi apagado com sucesso
+                int confirmaDelete = pst.executeUpdate();
+
+                if (confirmaDelete > 0) {
+                    JOptionPane.showMessageDialog(null, "Usuário removido com sucesso!");
+                    
+                    // Limpando os campos após a remoção
+                    txtUsuId.setText(null);
+                    txtUsuNome.setText(null);
+                    txtUsuFone.setText(null);
+                    txtUsuLogin.setText(null);
+                    txtUsuSenha.setText(null);
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
     }
 
     /**
@@ -231,6 +293,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
         btnUsuDelete.setToolTipText("Remover");
         btnUsuDelete.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnUsuDelete.setPreferredSize(new java.awt.Dimension(130, 130));
+        btnUsuDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUsuDeleteActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel7.setText("*Campos Obrigatórios");
@@ -353,6 +420,11 @@ public class TelaUsuario extends javax.swing.JInternalFrame {
     private void btnUsuUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuUpdateActionPerformed
         editar();
     }//GEN-LAST:event_btnUsuUpdateActionPerformed
+
+    private void btnUsuDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuDeleteActionPerformed
+        // Chamando o método remover
+        remover();
+    }//GEN-LAST:event_btnUsuDeleteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
