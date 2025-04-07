@@ -17,18 +17,19 @@ import net.proteanit.sql.DbUtils;
  * @author Smaug
  */
 public class TelaCliente extends javax.swing.JInternalFrame {
-    Connection conexao=null;
-    PreparedStatement pst=null;
-    ResultSet rs=null;
     
+    Connection conexao = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+
     /**
      * Creates new form TelaCliente
      */
     public TelaCliente() {
         initComponents();
-        conexao=ModuloConexao.connector();
+        conexao = ModuloConexao.connector();
     }
-    
+
     // Método para adicionar usuário
     private void adicionar() {
         String sql = "insert into tbclientes (nomecli, endcli, fonecli, emailcli)values (?,?,?,?)";
@@ -58,14 +59,12 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    
+
     // Método para buscar clientes pelo nome com filtros
-    private void buscar_cliente(){
-        String sql= "select * from tbclientes where  nomecli like ?";
+    private void buscar_cliente() {
+        String sql = "select * from tbclientes where  nomecli like ?";
         
-        
-        
-        try{
+        try {
             pst = conexao.prepareStatement(sql);
             // Passando o conteúdo do input de busca para o ?
             // atenção ao "%" - continuação de String sql
@@ -74,11 +73,19 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             // A linha abaixo usa a biblioteca rs2xml.jar para preencher a tabela
             tblClientes.setModel(DbUtils.resultSetToTableModel(rs));
             
-        } catch(Exception e){
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    
+
+    // Método para setar os campos do formulário com o conteúdo da tabela
+    public void setar_campos() {
+        int setar = tblClientes.getSelectedRow();
+        txtCliNome.setText(tblClientes.getModel().getValueAt(setar, 1).toString());
+        txtCliEndereco.setText(tblClientes.getModel().getValueAt(setar, 2).toString());
+        txtCliTelefone.setText(tblClientes.getModel().getValueAt(setar, 3).toString());
+        txtCliEmail.setText(tblClientes.getModel().getValueAt(setar, 4).toString());
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -154,6 +161,11 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblClientesMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblClientes);
 
         btnCliAdicionar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/servixos/icones/3440894_add_additional_document_file_filetype_icon.png"))); // NOI18N
@@ -269,6 +281,11 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         // Chamar método buscar cliente
         buscar_cliente();
     }//GEN-LAST:event_txtCliBuscarKeyReleased
+    // Método que setara o campo da tabela no formulário clicando com mouse
+    private void tblClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblClientesMouseClicked
+        // Chamando o método para settar campos
+        setar_campos();
+    }//GEN-LAST:event_tblClientesMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
