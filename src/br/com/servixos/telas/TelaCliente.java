@@ -9,6 +9,9 @@ import java.sql.*;
 import br.com.servixos.dao.ModuloConexao;
 import javax.swing.JOptionPane;
 
+// Importando recurso da biblioteca rs2ml.jar
+import net.proteanit.sql.DbUtils;
+
 /**
  *
  * @author Smaug
@@ -55,6 +58,27 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, e);
         }
     }
+    
+    // Método para buscar clientes pelo nome com filtros
+    private void buscar_cliente(){
+        String sql= "select * from tbclientes where  nomecli like ?";
+        
+        
+        
+        try{
+            pst = conexao.prepareStatement(sql);
+            // Passando o conteúdo do input de busca para o ?
+            // atenção ao "%" - continuação de String sql
+            pst.setString(1, txtCliBuscar.getText() + "%");
+            rs = pst.executeQuery();
+            // A linha abaixo usa a biblioteca rs2xml.jar para preencher a tabela
+            tblClientes.setModel(DbUtils.resultSetToTableModel(rs));
+            
+        } catch(Exception e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -74,14 +98,14 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         txtCliEmail = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        txtCliPesquisar = new javax.swing.JTextField();
+        txtCliBuscar = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        txtCliTbl = new javax.swing.JTable();
+        tblClientes = new javax.swing.JTable();
         btnCliAdicionar = new javax.swing.JButton();
         btnCliEditar = new javax.swing.JButton();
         btnCliRemover = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
         txtCliNome = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
@@ -112,9 +136,14 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel6.setText("Cadastrar Cliente");
 
-        txtCliPesquisar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtCliBuscar.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtCliBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCliBuscarKeyReleased(evt);
+            }
+        });
 
-        txtCliTbl.setModel(new javax.swing.table.DefaultTableModel(
+        tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -125,7 +154,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(txtCliTbl);
+        jScrollPane1.setViewportView(tblClientes);
 
         btnCliAdicionar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/servixos/icones/3440894_add_additional_document_file_filetype_icon.png"))); // NOI18N
         btnCliAdicionar.setToolTipText("Adicionar");
@@ -144,10 +173,9 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         btnCliRemover.setToolTipText("Remover");
         btnCliRemover.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/servixos/icones/285651_search_icon (1).png"))); // NOI18N
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
         txtCliNome.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/servixos/icones/285651_search_icon (1).png"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -165,9 +193,9 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                         .addComponent(jScrollPane1)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(txtCliPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtCliBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel7)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -185,13 +213,13 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtCliTelefone, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtCliEmail, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())))
+                        .addGap(25, 25, 25))))
             .addGroup(layout.createSequentialGroup()
                 .addGap(89, 89, 89)
                 .addComponent(btnCliAdicionar)
-                .addGap(57, 57, 57)
+                .addGap(59, 59, 59)
                 .addComponent(btnCliEditar)
-                .addGap(62, 62, 62)
+                .addGap(60, 60, 60)
                 .addComponent(btnCliRemover)
                 .addGap(0, 93, Short.MAX_VALUE))
         );
@@ -203,9 +231,9 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                     .addComponent(jLabel6)
                     .addComponent(jLabel5))
                 .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(txtCliPesquisar))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtCliBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
                 .addGap(30, 30, 30)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(54, 54, 54)
@@ -236,24 +264,30 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         adicionar();
     }//GEN-LAST:event_btnCliAdicionarActionPerformed
 
+    // O evento e do tipo "enquanto for digitando" apareça algo em tempo real
+    private void txtCliBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCliBuscarKeyReleased
+        // Chamar método buscar cliente
+        buscar_cliente();
+    }//GEN-LAST:event_txtCliBuscarKeyReleased
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCliAdicionar;
     private javax.swing.JButton btnCliEditar;
     private javax.swing.JButton btnCliRemover;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblClientes;
+    private javax.swing.JTextField txtCliBuscar;
     private javax.swing.JTextField txtCliEmail;
     private javax.swing.JTextField txtCliEndereco;
     private javax.swing.JTextField txtCliNome;
-    private javax.swing.JTextField txtCliPesquisar;
-    private javax.swing.JTable txtCliTbl;
     private javax.swing.JTextField txtCliTelefone;
     // End of variables declaration//GEN-END:variables
 }
