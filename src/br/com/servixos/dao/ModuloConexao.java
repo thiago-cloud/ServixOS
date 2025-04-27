@@ -7,6 +7,7 @@ package br.com.servixos.dao;
 
 import com.sun.jdi.connect.spi.Connection;
 import java.sql.DriverManager;
+//import java.sql.Connection;
 
 /**
  *
@@ -22,7 +23,7 @@ public class ModuloConexao {
         // Armazena informações referente ao banco
         String url = "jdbc:mysql://localhost:3306/dbservixos";
         String user = "root";
-        String password = "970216";
+        String password = "";
         // Estabelecendo a conexão
         try {
             Class.forName(driver);
