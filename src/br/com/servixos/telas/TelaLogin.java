@@ -131,7 +131,8 @@ public class TelaLogin extends javax.swing.JFrame {
         });
 
         btnLogin.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        btnLogin.setText("Login");
+        btnLogin.setText("Entrar");
+        btnLogin.setToolTipText("Entrar");
         btnLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnLogin.setPreferredSize(new java.awt.Dimension(54, 25));
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
