@@ -86,6 +86,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         txtCliEndereco.setText(tblClientes.getModel().getValueAt(setar, 2).toString());
         txtCliTelefone.setText(tblClientes.getModel().getValueAt(setar, 3).toString());
         txtCliEmail.setText(tblClientes.getModel().getValueAt(setar, 4).toString());
+        //Disabilitar o botão adicionar evitando duplicidade de registro
+        btnCliAdicionar.setEnabled(false);
     }
     
     // Metodo para a editar dados do cliente
@@ -113,6 +115,8 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                     txtCliEndereco.setText(null);
                     txtCliTelefone.setText(null);
                     txtCliEmail.setText(null);
+                    // Habilitando o botão adicionar após a alteração e todos os campos limpos
+                    btnCliAdicionar.setEnabled(true);
                 }
             }
         } catch (Exception e) {
