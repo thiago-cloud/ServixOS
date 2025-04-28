@@ -8,6 +8,7 @@ package br.com.servixos.telas;
 import java.sql.*;
 import br.com.servixos.dao.ModuloConexao;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 // Importando recurso da biblioteca rs2ml.jar
 import net.proteanit.sql.DbUtils;
@@ -49,10 +50,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 int adicionado = pst.executeUpdate();
                 if (adicionado > 0) {
                     JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!");
-                    txtCliNome.setText(null);
-                    txtCliTelefone.setText(null);
-                    txtCliEndereco.setText(null);
-                    txtCliEmail.setText(null);
+                    limpar();
                 }
             }
         } catch (Exception e) {
@@ -62,7 +60,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
     // Método para buscar clientes pelo nome com filtros
     private void buscar_cliente() {
-        String sql = "select * from tbclientes where  nomecli like ?";
+        String sql = "select idcli as Id, nomecli as Nome, endcli as Endereço, fonecli as Fone, emailcli as Email from tbclientes where  nomecli like ?";
         
         try {
             pst = conexao.prepareStatement(sql);
@@ -111,10 +109,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 int adicionado = pst.executeUpdate();
                 if (adicionado > 0) {
                     JOptionPane.showMessageDialog(null, "Dados do Cliente alterados com sucesso!");
-                    txtCliNome.setText(null);
-                    txtCliEndereco.setText(null);
-                    txtCliTelefone.setText(null);
-                    txtCliEmail.setText(null);
+                    limpar();
                     // Habilitando o botão adicionar após a alteração e todos os campos limpos
                     btnCliAdicionar.setEnabled(true);
                 }
@@ -123,7 +118,45 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, e);
         }
     }
+        
+    // Método Remover Cliente
+    private void remover() {
+        
+        // Caixa de dialogo para confirmar remoção do usuário
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover este cliente", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirma == JOptionPane.YES_OPTION) {
+            //Removendo o usuário utilizando o id como referência
+            String sql = "delete from tbclientes where idcli=?";
 
+            try {
+                // Estabelecendo conexão com o banco
+                pst = conexao.prepareStatement(sql);
+                pst.setString(1, txtIdCli.getText());
+                
+                // Caixa de mensagem confirmando que foi apagado com sucesso
+                int confirmaDelete = pst.executeUpdate();
+
+                if (confirmaDelete > 0) {
+                    JOptionPane.showMessageDialog(null, "Cliente removido com sucesso!");
+                    
+                    limpar();
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }
+    // Método que limpar a tabela e os campos
+    private void limpar() {
+        txtCliBuscar.setText(null);
+        txtIdCli.setText(null);
+        txtCliNome.setText(null);
+        txtCliEndereco.setText(null);
+        txtCliTelefone.setText(null);
+        txtCliEmail.setText(null);
+        ((DefaultTableModel) tblClientes.getModel()).setRowCount(0);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -189,17 +222,27 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             }
         });
 
+        tblClientes = new javax.swing.JTable(){
+            //Esse método impede que as linhas e campos sejam editados
+            public boolean isCellEditable(int rowIndex, int colIndex){
+                return false;
+            }
+        };
         tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Id", "Nome", "Endereço", "Fone", "Email"
             }
         ));
+        tblClientes.setFocusable(false);
+        tblClientes.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        tblClientes.setShowHorizontalLines(false);
+        tblClientes.getTableHeader().setReorderingAllowed(false);
         tblClientes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblClientesMouseClicked(evt);
@@ -228,6 +271,11 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         btnCliRemover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/servixos/icones/3440892_delete_document_file_filetype_paper_icon.png"))); // NOI18N
         btnCliRemover.setToolTipText("Remover");
         btnCliRemover.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCliRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCliRemoverActionPerformed(evt);
+            }
+        });
 
         txtCliNome.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         txtCliNome.addActionListener(new java.awt.event.ActionListener() {
@@ -240,6 +288,11 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
         txtIdCli.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         txtIdCli.setEnabled(false);
+        txtIdCli.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtIdCliActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel8.setText("ID");
@@ -364,6 +417,15 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         // Chamando o método editar Clientes
         editar();
     }//GEN-LAST:event_btnCliEditarActionPerformed
+
+    private void btnCliRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCliRemoverActionPerformed
+       // Chamando o método remover
+       remover();
+    }//GEN-LAST:event_btnCliRemoverActionPerformed
+
+    private void txtIdCliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdCliActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdCliActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
